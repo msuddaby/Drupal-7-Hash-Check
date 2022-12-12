@@ -1,10 +1,10 @@
-﻿// See https://aka.ms/new-console-template for more information
-using System.ComponentModel;
-using System.Linq;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
+
+// https://github.com/drupal/drupal/blob/7.x/includes/password.inc - what this was rewritten from.
+
+//Hash and salt the password
 string password_crypt(string algo, string password, string setting)
 {
     if(password.Length > 512)
@@ -45,7 +45,8 @@ string password_crypt(string algo, string password, string setting)
 }
 
 
-
+// This function makes absolutley no sense. Why they wouldn't just use PHP's built-in Base64 encoder is beyond me.
+// Convert the hash bytearray to Base64.
 string tobase64(byte[] input, int count)
 {
     string output = "";
@@ -96,68 +97,21 @@ string tobase64(byte[] input, int count)
 
 }
 
-string tobase64str(string input, int count)
-{
-    string output = "";
-    int i = 0;
-    string itoa64 = _password_itoa64();
-    do
-    {
-        //string value = ord($input[$i++]);
-        var value = input[i++];
-        //$output.= $itoa64[$value & 0x3f];
-        output += itoa64[value & 0x3f];
-        //if ($i < $count) {
-        if (i < count)
-        {
-            //$value |= ord($input[$i]) << 8;
-            value = ((char)(value | input[i] << 8));
-        }
-        //$output.= $itoa64[($value >> 6) & 0x3f];
-        output += itoa64[(value >> 6) & 0x3f];
-        //if ($i++ >= $count) {
-        if (i++ >= count)
-        {
-            break;
-        }
-        //if ($i < $count) {
-        if (i < count)
-        {
-            //$value |= ord($input[$i]) << 16;
-            value = (char)(value | input[i] << 16);
-        }
-        //$output.= $itoa64[($value >> 12) & 0x3f];
-        output += itoa64[(value >> 12) & 0x3f];
-        //if ($i++ >= $count) {
-        if (i++ >= count)
-        {
-            break;
-        }
-        //$output.= $itoa64[($value >> 18) & 0x3f];
-        output += itoa64[(value >> 18) & 0x3f];
-    } while (i < count);
 
-    return output;
-
-
-
-
-}
-
-
-
-
+// Why???
 string _password_itoa64()
 {
     return "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 }
 
+// shrug
 int getlogcount(string setting)
 {
     string itoa64 = _password_itoa64();
     return itoa64.IndexOf(setting[3]);
 }
 
+//Call this function. It will return true if the password matches the hash.
 bool checkpass(string password, string hashed)
 {
 
